@@ -1,5 +1,4 @@
 import matplotlib.pyplot as plt
-import pandas as pd
 import numpy as np
 
 
@@ -45,3 +44,29 @@ def input_missing_flags(dataframe, columns, missing_value):
     copy['missing_total'] = copy.loc[:, missing_columns].apply(lambda row: np.sum(row), axis=1)
 
     return copy
+
+
+def input_mean(dataframe, columns, target_column=None):
+    if target_column == None:
+        copy = dataframe.copy()
+        copy.loc[:, columns] = copy.loc[:, columns].transform(lambda x: x.fillna(x.mean()))
+    else:
+        copy = dataframe.copy()
+        copy.loc[:, columns] = copy.groupby(target_column)[columns].transform(lambda x: x.fillna(x.mean()))
+
+    return copy
+
+
+def transform_missing_into_na(dataframe, missing_value):
+    copy = dataframe.copy()
+    copy.replace(to_replace=missing_value, value=np.nan, inplace=True)
+
+    return copy
+
+
+def get_means_by_column(dataframe, columns):
+    means = {}
+    for col in columns:
+        means[col] = dataframe[col].mean()
+
+    return means
