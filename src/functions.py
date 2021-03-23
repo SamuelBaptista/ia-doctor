@@ -1,6 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
+from DataProcesser import DataProcesser
+
 
 def display_missing_barchart(dataframe, columns, missing_value):
     
@@ -70,3 +72,21 @@ def get_means_by_column(dataframe, columns):
         means[col] = dataframe[col].mean()
 
     return means
+
+
+def process_and_predict(dataset, model, imputer, drop_cols):
+    dp_teste = DataProcesser(X=dataset.drop(drop_cols, axis=1), mean_dict=imputer)
+    dataset_teste_processado = dp_teste.process_test_data()
+
+    predictions = model.predict(dataset_teste_processado)
+
+    return predictions
+
+
+def process_and_predict_proba(dataset, model, imputer, drop_cols):
+    dp_teste = DataProcesser(X=dataset.drop(drop_cols, axis=1), mean_dict=imputer)
+    dataset_teste_processado = dp_teste.process_test_data()
+
+    predictions = model.predict_proba(dataset_teste_processado)
+
+    return predictions
