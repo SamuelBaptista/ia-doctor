@@ -2,7 +2,6 @@ import os
 import re
 
 import matplotlib.pyplot as plt
-import numpy as np
 import joblib as jl
 
 from DataProcesser import DataProcesser
@@ -38,44 +37,6 @@ def display_missing_barchart(dataframe, columns, missing_value):
 def display_distribution_boxchart(dataframe, columns):
     dataframe.loc[:, columns].plot(kind='box', subplots=True, layout=(1,len(columns)), figsize=(30,5))
     plt.show()
-
-
-def input_missing_flags(dataframe, columns, missing_value):
-    missing_columns = []
-    copy = dataframe.copy()
-    for col in columns:
-        copy[col+'_miss'] = np.where(copy[col] == missing_value, 1, 0)
-        missing_columns.append(col+'_miss')
-
-    copy['missing_total'] = copy.loc[:, missing_columns].apply(lambda row: np.sum(row), axis=1)
-
-    return copy
-
-
-def input_mean(dataframe, columns, target_column=None):
-    if target_column == None:
-        copy = dataframe.copy()
-        copy.loc[:, columns] = copy.loc[:, columns].transform(lambda x: x.fillna(x.mean()))
-    else:
-        copy = dataframe.copy()
-        copy.loc[:, columns] = copy.groupby(target_column)[columns].transform(lambda x: x.fillna(x.mean()))
-
-    return copy
-
-
-def transform_missing_into_na(dataframe, missing_value):
-    copy = dataframe.copy()
-    copy.replace(to_replace=missing_value, value=np.nan, inplace=True)
-
-    return copy
-
-
-def get_means_by_column(dataframe, columns):
-    means = {}
-    for col in columns:
-        means[col] = dataframe[col].mean()
-
-    return means
 
 
 def process_and_predict(dataset, model, imputer, drop_cols):
@@ -137,10 +98,13 @@ def load_last_model(model_path):
         model_dir = os.listdir(model_path)
         model_version = sorted(model_dir, key=_natural_key)[-1]
 
+        print(model_path + '/' + model_version)
+
         return jl.load(model_path + '/' + model_version)
 
     else:
-        return None
+        print('no models in directory to load...')
+        
 
 def save_model(model, model_path, model_name):
     final_path = _check_version(model_path, model_name)
